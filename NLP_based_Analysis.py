@@ -27,13 +27,13 @@ def RemoveStopWords(BlobList):
     MyBlobList = []
     # print(len(BlobList[0]))
     for blob in BlobList:
-        WordList = [word.lower() for word in blob.words if word.lower() not in stop_words]
-        # WordList = [word for word in blob.words if word not in stop_words]
+        # "if not word.isdigit()"" will exclude any number in the text. 
+        WordList = [word.lower() for word in blob.words if word.lower() not in stop_words if not word.isdigit()]
         MyBlobList.append(WordList)   
     # print(MyBlobList[2]) 
     return MyBlobList
 def GetWordCount(BlobList):
-    # convert each sublit list of words to a string
+    # convert each sublit list of words to a string so TextBlob can be used to get words count
     SubList = [' '.join(sublist) for sublist in BlobList]
 
     Dic_List = []
@@ -42,12 +42,21 @@ def GetWordCount(BlobList):
         Wordcount = list(blob.word_counts.items())
         Dic_List.append(Wordcount)
     return Dic_List
+def GetTop100Words(list):
+    Top100words=[]
+    for item in list:
+        sorted_items = sorted(item, key=itemgetter(1), reverse=True)
+    # add only top 100 words 
+        Top100words.append(sorted_items[:100]) 
+
+    return Top100words
 def Top25WordsPlot(list):
+
     top25Words = []
     for item in list:
         sorted_items = sorted(item, key=itemgetter(1), reverse=True)
-        top25Words.append(sorted_items[:25])
-    print("=========================================")
+        # add only top 25 words 
+        top25Words.append(sorted_items[:25]) 
 
     fig, axis = plt.subplots(3,1,figsize=(20, 8))
     for i, ax in enumerate( axis.flat):
@@ -61,7 +70,6 @@ def Top25WordsPlot(list):
         ax.set_ylabel('Count')
         ax.tick_params(labelrotation=50)  # Rotate labels for better readability
         ax.tick_params(labelbottom=True)
-        # fig.tight_layout(pad=10.0)
         plt.tight_layout(pad=2.0)
     plt.show()
     return top25Words
@@ -70,6 +78,8 @@ BlobList = ReadAllFiles()
 MyList= RemoveStopWords(BlobList)
 FileWordCount = GetWordCount(MyList)
 # Part 2b
+list_100=GetTop100Words(FileWordCount)
+print(len(list_100[0]))
 Top25WordsPlot(FileWordCount)
 # print(FileWordCount)
 # Part 2c
