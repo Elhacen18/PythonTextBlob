@@ -49,7 +49,7 @@ def Top25WordsPlot(list):
         top25Words.append(sorted_items[:25])
     print("=========================================")
 
-    fig, axis = plt.subplots(3,1,figsize=(16, 8))
+    fig, axis = plt.subplots(3,1,figsize=(20, 8))
     for i, ax in enumerate( axis.flat):
     
         keys_list = [key for key in dict(top25Words[i])]
@@ -59,10 +59,10 @@ def Top25WordsPlot(list):
         ax.set_title(f'{fileName[i]} top 25 words')
         ax.set_xlabel('word')
         ax.set_ylabel('Count')
-        ax.tick_params(labelrotation=90)  # Rotate labels for better readability
+        ax.tick_params(labelrotation=50)  # Rotate labels for better readability
         ax.tick_params(labelbottom=True)
-        fig.tight_layout(pad=10.0)
-        plt.tight_layout()
+        # fig.tight_layout(pad=10.0)
+        plt.tight_layout(pad=2.0)
     plt.show()
     return top25Words
 
