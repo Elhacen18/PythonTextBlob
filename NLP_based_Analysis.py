@@ -92,15 +92,34 @@ def DisplayWordCloud(list):
         ax.axis('off')
     plt.tight_layout()   
     plt.show()
+def Top25cumulativeWord(lists):
+    Top25words =[]
+    # for list in list Merge sublists in one list
+    MyList = [list for list in lists for list in list] 
+    for item in MyList:
+            word,count = item
+            Top25words.append({word:count})
+          
+    Top25cumulativeWord = {}
+    for item in MyList:
+        word,count = item
+        # print(word,count)
+        Top25cumulativeWord[word] = Top25cumulativeWord.get(word, 0) + count
 
-    return
+    print(len(Top25cumulativeWord))
+    return Top25cumulativeWord
 
+
+    
 BlobList = ReadAllFiles()
 MyList= RemoveStopWords(BlobList)
 FileWordCount = GetWordCount(MyList)
 # Part 2b
 list_100=GetTop100Words(FileWordCount)
-Top25WordsPlot(FileWordCount)
+Top25words = Top25WordsPlot(FileWordCount)
 # Part 2c
 DisplayWordCloud(list_100)
+print(Top25words)
+# part 3a
+Top25cumulativeWord(Top25words)
 
