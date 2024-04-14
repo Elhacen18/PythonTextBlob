@@ -1,3 +1,4 @@
+from typing import Counter
 from textblob import TextBlob
 import nltk
 from nltk.corpus import stopwords
@@ -15,6 +16,9 @@ import imageio
 nltk.download('stopwords')
 stop_words = list(stopwords.words('english'))
 fileName = ['Taken_Or_Left_novel.txt','Catching_of_the_whale_and_seal.txt','Extramammary_Articale.txt']
+# From assignment2 
+def Get_Words_Freq(list): # using this fucntion to get word frequancy for all three files as one list. 
+    return Counter(list)
 def ReadAllFiles():
     MyList = []
     blob1 = TextBlob(Path('Taken_Or_Left_novel.txt').read_text())
@@ -23,6 +27,7 @@ def ReadAllFiles():
     MyList.append(blob2)
     blob3 = TextBlob(Path('Extramammary_Articale.txt').read_text())
     MyList.append(blob3)
+    print(len(MyList))
     return MyList
 def RemoveStopWords(BlobList):
     WordList = []
@@ -30,96 +35,117 @@ def RemoveStopWords(BlobList):
     for blob in BlobList:
         # "if not word.isdigit()"" will exclude any number in the text. 
         WordList = [word.lower() for word in blob.words if word.lower() not in stop_words if not word.isdigit()]
-        MyBlobList.append(WordList)   
+        MyBlobList.append(WordList) 
+    print(len(MyBlobList))
     return MyBlobList
 def GetWordCount(BlobList):
+
     # convert each sublit list of words to a string so TextBlob can be used to get words count
     SubList = [' '.join(sublist) for sublist in BlobList]
 
     Dic_List = []
     for List in SubList: 
         blob = TextBlob(List)
+        
         Wordcount = list(blob.word_counts.items())
         Dic_List.append(Wordcount)
+
+    # print(Dic_List) 
+  
+
     return Dic_List
-def GetTop100Words(list):
-    Top100words=[]
-    for item in list:
-        sorted_items = sorted(item, key=itemgetter(1), reverse=True)
-    # add only top 100 words 
-        Top100words.append(sorted_items[:100]) 
-    
-    return Top100words
 def Top25WordsPlot(list):
 
     top25Words = []
+    # Get top 20 word for each file
     for item in list:
-        sorted_items = sorted(item, key=itemgetter(1), reverse=True)
+        file = sorted(item, key=itemgetter(1), reverse=True)
         # add only top 25 words 
-        top25Words.append(sorted_items[:25]) 
-
+        top25Words.append(file[:25])
+    # print(top25Words)
     fig, axis = plt.subplots(3,1,figsize=(20, 8))
+
+
     for i, ax in enumerate( axis.flat):
-    
         keys_list = [key for key in dict(top25Words[i])]
         values_list = [dict(top25Words[i])[key] for key in dict(top25Words[i])]
 
+        Words = [key for key in dict(top25Words[i])]
         ax.bar(keys_list, values_list, color='green')
         ax.set_title(f'{fileName[i]} top {len(top25Words[i])} words')
-        ax.set_xlabel('word')
+        ax.set_xlabel('words')
         ax.set_ylabel('Count')
         ax.tick_params(labelrotation=50)  # Rotate labels for better readability
         ax.tick_params(labelbottom=True)
         plt.tight_layout(pad=2.0)
     plt.show()
-    return top25Words
+def Displa100yWordCloud(List):
 
-def DisplayWordCloud(list):
+
+    Top100words=[]
+    for item in List:
+        file = sorted(item, key=itemgetter(1), reverse=True)
+    # add only top 100 words 
+        Top100words.append(file[:100]) 
+    # print(Top100words)
+
     mask_image = imageio.v2.imread('AppleLogo.png') 
     wc = WordCloud(width=1000, height=1000,
     colormap='prism', mask=mask_image,background_color='white')
 
+   
+    Top_100_words= int((len(Top100words[0])+(len(Top100words[1]))+(len(Top100words[2])))/(len(Top100words)))
     fig = plt.figure(figsize=(15, 5))
-    Top_100_words = int((len(list[0])+(len(list[1]))+(len(list[2])))/(len(list)))
     fig.suptitle(f"Apple logo word cloud for each document's top {Top_100_words} words")
-
-    for i in range(len(list)):
-        wc.fit_words(dict(list[i]))
+    for i in range(len(List)):
+        wc.fit_words(dict(Top100words[i]))
         # i+1 will place each subplot in the correct position inside of the figure.
         ax =fig.add_subplot(1, 3, i+1) # print(i)
-        ax.set_title(f'{fileName[i]} top {len(list[i])} words')
+        ax.set_title(f'{fileName[i]} top {len(Top100words[i])} words')
         ax.imshow(wc, interpolation="bilinear")
         ax.axis('off')
     plt.tight_layout()   
     plt.show()
 def Top25cumulativeWord(lists):
-    Top25words =[]
-    # for list in list Merge sublists in one list
-    MyList = [list for list in lists for list in list] 
-    for item in MyList:
-            word,count = item
-            Top25words.append({word:count})
-          
-    Top25cumulativeWord = {}
-    for item in MyList:
-        word,count = item
-        # print(word,count)
-        Top25cumulativeWord[word] = Top25cumulativeWord.get(word, 0) + count
+    AllWordlist =[]
+    SortList = []
+    # print(lists)
 
-    print(len(Top25cumulativeWord))
-    return Top25cumulativeWord
-
-
+    # "for list in list" Merge sublists into one list
+    AllfilesMerged = [list for list in lists for list in list] 
+    wordCumlative = Get_Words_Freq(AllfilesMerged)
+    AllWordlist = list(wordCumlative.items())
+ 
     
-BlobList = ReadAllFiles()
-MyList= RemoveStopWords(BlobList)
-FileWordCount = GetWordCount(MyList)
+    SortList =  sorted(AllWordlist, key=itemgetter(1), reverse=True)
+    Top25CumalativeWords=  SortList[:25]
+    print(Top25CumalativeWords)
+    return Top25CumalativeWords
+
+def OutPutToCSVFile(words):
+    print(words)
+    with open("MCW.csv", 'w') as file:
+        sum = 0
+        file.write(f"word,Count\n")
+        for word in words:
+            sum = sum + word[1]
+            file.write(f"{word[0]},{word[1]}\n")
+        file.write(f"Sum,{sum}")
+
+# Part 1
+ThreeFilesBlob = ReadAllFiles()
+FilesWoStopWord= RemoveStopWords(ThreeFilesBlob)
+# Par 2a
+WordCountByFiles = GetWordCount(FilesWoStopWord) 
 # Part 2b
-list_100=GetTop100Words(FileWordCount)
-Top25words = Top25WordsPlot(FileWordCount)
+Top25WordsPlot(WordCountByFiles)
+
 # Part 2c
-DisplayWordCloud(list_100)
-print(Top25words)
+Displa100yWordCloud(WordCountByFiles)
 # part 3a
-Top25cumulativeWord(Top25words)
+top25cumlativeword =Top25cumulativeWord(FilesWoStopWord)
+# part 3b
+OutPutToCSVFile(top25cumlativeword)
+# part 4a
+
 
