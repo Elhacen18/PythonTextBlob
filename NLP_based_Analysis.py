@@ -1,5 +1,6 @@
 from typing import Counter
 from textblob import TextBlob
+from textatistic import Textatistic
 import nltk
 from nltk.corpus import stopwords
 from pathlib import Path
@@ -119,11 +120,11 @@ def Top25cumulativeWord(lists):
     
     SortList =  sorted(AllWordlist, key=itemgetter(1), reverse=True)
     Top25CumalativeWords=  SortList[:25]
-    print(Top25CumalativeWords)
+    # print(Top25CumalativeWords)
     return Top25CumalativeWords
 
 def OutPutToCSVFile(words):
-    print(words)
+    # print(words)
     with open("MCW.csv", 'w') as file:
         sum = 0
         file.write(f"word,Count\n")
@@ -131,10 +132,19 @@ def OutPutToCSVFile(words):
             sum = sum + word[1]
             file.write(f"{word[0]},{word[1]}\n")
         file.write(f"Sum,{sum}")
+def ListsToText(FilesWoStopWord):
+    TextList =[]
+    for text in FilesWoStopWord:
+        Words = [word for word in text ]
+        Text = " ".join(Words)
+        TextList.append(Text)
+    print(TextList)
 
+    return
 # Part 1
 ThreeFilesBlob = ReadAllFiles()
 FilesWoStopWord= RemoveStopWords(ThreeFilesBlob)
+print(FilesWoStopWord)
 # Par 2a
 WordCountByFiles = GetWordCount(FilesWoStopWord) 
 # Part 2b
@@ -147,5 +157,8 @@ top25cumlativeword =Top25cumulativeWord(FilesWoStopWord)
 # part 3b
 OutPutToCSVFile(top25cumlativeword)
 # part 4a
+ListsToText(FilesWoStopWord)
+# TextAtistic = Textatistic(FilesWoStopWord)
+# print(TextAtistic.flesch_score)
 
 
